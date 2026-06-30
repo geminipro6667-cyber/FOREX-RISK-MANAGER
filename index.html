@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Forex Risk &amp; Position Size Calculator</title>
+<meta name="description" content="Institutional-grade Forex position size, P&L, margin, pip value and instrument comparison calculator">
+<meta name="theme-color" content="#0f1117">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="app-header">
+    <h1>Forex Risk Calculator</h1>
+    <p>Position size · P&amp;L · Margin · Pip value · Compare</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="pos">Position Size</button>
+    <button class="tab" data-tab="pnl">P&amp;L &amp; R:R</button>
+    <button class="tab" data-tab="margin">Margin</button>
+    <button class="tab" data-tab="pip">Pip Value</button>
+    <button class="tab" data-tab="compare">Compare</button>
+  </nav>
+
+  <!-- POSITION SIZE -->
+  <section id="pos" class="panel active">
+    <h2 class="section-title">অ্যাকাউন্ট তথ্য</h2>
+    <div class="grid2">
+      <div class="field">
+        <label for="ps_bal">Account balance (USD)</label>
+        <input type="number" id="ps_bal" value="10000" min="1">
+      </div>
+      <div class="field">
+        <label for="ps_risk">Risk %</label>
+        <input type="number" id="ps_risk" value="1" min="0.1" max="10" step="0.1">
+      </div>
+    </div>
+
+    <h2 class="section-title">ট্রেড সেটআপ</h2>
+    <div class="grid3">
+      <div class="field">
+        <label for="ps_pair">Instrument</label>
+        <select id="ps_pair">
+          <optgroup label="Forex Majors">
+            <option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option>
+            <option>USD/CHF</option><option>USD/CAD</option><option>AUD/USD</option><option>NZD/USD</option>
+          </optgroup>
+          <optgroup label="Forex Crosses">
+            <option>EUR/GBP</option><option>EUR/JPY</option><option>GBP/JPY</option>
+            <option>GBP/CHF</option><option>AUD/JPY</option><option>CAD/JPY</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option selected>XAU/USD</option><option>XAG/USD</option>
+          </optgroup>
+          <optgroup label="Indices">
+            <option>US30</option><option>NAS100</option><option>SPX500</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ps_entry">Entry price</label>
+        <input type="number" id="ps_entry" value="2650.00" step="0.00001">
+      </div>
+      <div class="field">
+        <label for="ps_sl">Stop-loss price</label>
+        <input type="number" id="ps_sl" value="2635.00" step="0.00001">
+      </div>
+    </div>
+
+    <button class="btn" id="ps_calc">Calculate lot size</button>
+    <div id="ps_warn" class="warn-box"></div>
+
+    <div class="results" id="ps_results">
+      <div class="res-header">Position size result</div>
+      <div class="res-row"><span class="res-label">Dollar risk amount</span><span class="res-val amber" id="ps_r_dollarrisk"></span></div>
+      <div class="res-row"><span class="res-label">Stop distance (pips)</span><span class="res-val" id="ps_r_pipdist"></span></div>
+      <div class="res-row"><span class="res-label">Pip value per std lot</span><span class="res-val" id="ps_r_pipval"></span></div>
+      <div class="res-row"><span class="res-label">Recommended lot size</span><span class="res-val blue big" id="ps_r_lots"></span></div>
+      <div class="res-row"><span class="res-label">Units / contracts</span><span class="res-val" id="ps_r_units"></span></div>
+      <div class="res-row"><span class="res-label">Notional value</span><span class="res-val" id="ps_r_notional"></span></div>
+      <div class="res-row"><span class="res-label">Risk level</span><span class="res-val" id="ps_r_risk_pill"></span></div>
+    </div>
+  </section>
+
+  <!-- P&L -->
+  <section id="pnl" class="panel">
+    <div class="grid3">
+      <div class="field">
+        <label for="pnl_pair">Instrument</label>
+        <select id="pnl_pair">
+          <optgroup label="Forex Majors">
+            <option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option>
+            <option>USD/CHF</option><option>USD/CAD</option><option>AUD/USD</option><option>NZD/USD</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option selected>XAU/USD</option><option>XAG/USD</option>
+          </optgroup>
+          <optgroup label="Indices">
+            <option>US30</option><option>NAS100</option><option>SPX500</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pnl_lots">Lot size</label>
+        <input type="number" id="pnl_lots" value="0.05" step="0.01" min="0.01">
+      </div>
+      <div class="field">
+        <label for="pnl_dir">Direction</label>
+        <select id="pnl_dir">
+          <option value="1">Buy (Long)</option>
+          <option value="-1">Sell (Short)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="field">
+        <label for="pnl_entry">Entry price</label>
+        <input type="number" id="pnl_entry" value="2650.00" step="0.01">
+      </div>
+      <div class="field">
+        <label for="pnl_tp">Take profit</label>
+        <input type="number" id="pnl_tp" value="2680.00" step="0.01">
+      </div>
+      <div class="field">
+        <label for="pnl_sl">Stop loss</label>
+        <input type="number" id="pnl_sl" value="2635.00" step="0.01">
+      </div>
+    </div>
+
+    <button class="btn green" id="pnl_calc">Calculate P&amp;L &amp; R:R</button>
+
+    <div class="results" id="pnl_results">
+      <div class="res-header">Trade analysis</div>
+      <div class="res-row"><span class="res-label">Potential profit</span><span class="res-val green" id="pnl_r_profit"></span></div>
+      <div class="res-row"><span class="res-label">Potential loss</span><span class="res-val red" id="pnl_r_loss"></span></div>
+      <div class="res-row"><span class="res-label">Profit pips</span><span class="res-val" id="pnl_r_tppips"></span></div>
+      <div class="res-row"><span class="res-label">Loss pips / SL distance</span><span class="res-val" id="pnl_r_slpips"></span></div>
+      <div class="res-row"><span class="res-label">Risk:Reward ratio</span><span class="res-val blue big" id="pnl_r_rr"></span></div>
+      <div class="res-row"><span class="res-label">Break-even win rate</span><span class="res-val" id="pnl_r_be"></span></div>
+      <div class="res-row"><span class="res-label">Expected value (per trade)</span><span class="res-val" id="pnl_r_ev"></span></div>
+      <div class="res-row"><span class="res-label">Trade quality</span><span class="res-val" id="pnl_r_quality"></span></div>
+    </div>
+  </section>
+
+  <!-- MARGIN -->
+  <section id="margin" class="panel">
+    <div class="grid2">
+      <div class="field">
+        <label for="mg_pair">Instrument</label>
+        <select id="mg_pair">
+          <optgroup label="Forex Majors">
+            <option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option><option>USD/CAD</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option selected>XAU/USD</option><option>XAG/USD</option>
+          </optgroup>
+          <optgroup label="Indices">
+            <option>US30</option><option>NAS100</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="mg_price">Current price</label>
+        <input type="number" id="mg_price" value="2650.00" step="0.01">
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="field">
+        <label for="mg_lots">Lot size</label>
+        <input type="number" id="mg_lots" value="0.05" step="0.01">
+      </div>
+      <div class="field">
+        <label for="mg_lev">Leverage (e.g. 100)</label>
+        <input type="number" id="mg_lev" value="100" min="1" max="2000">
+      </div>
+      <div class="field">
+        <label for="mg_bal">Account balance</label>
+        <input type="number" id="mg_bal" value="10000">
+      </div>
+    </div>
+
+    <button class="btn" id="mg_calc">Calculate margin</button>
+
+    <div class="results" id="mg_results">
+      <div class="res-header">Margin analysis</div>
+      <div class="res-row"><span class="res-label">Contract / notional value</span><span class="res-val" id="mg_r_notional"></span></div>
+      <div class="res-row"><span class="res-label">Required margin</span><span class="res-val blue big" id="mg_r_req"></span></div>
+      <div class="res-row"><span class="res-label">Margin % of balance</span><span class="res-val" id="mg_r_pct"></span></div>
+      <div class="res-row"><span class="res-label">Free margin remaining</span><span class="res-val green" id="mg_r_free"></span></div>
+      <div class="res-row"><span class="res-label">Margin level</span><span class="res-val" id="mg_r_level"></span></div>
+      <div class="res-row"><span class="res-label">Effective leverage</span><span class="res-val" id="mg_r_effLev"></span></div>
+      <div class="res-row"><span class="res-label">Margin status</span><span class="res-val" id="mg_r_status"></span></div>
+    </div>
+    <div id="mg_warn" class="warn-box"></div>
+  </section>
+
+  <!-- PIP VALUE -->
+  <section id="pip" class="panel">
+    <div class="grid2">
+      <div class="field">
+        <label for="pip_pair">Instrument</label>
+        <select id="pip_pair">
+          <optgroup label="Forex Majors">
+            <option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option>
+            <option>USD/CHF</option><option>USD/CAD</option><option>AUD/USD</option><option>NZD/USD</option>
+          </optgroup>
+          <optgroup label="Forex Crosses">
+            <option>EUR/JPY</option><option>GBP/JPY</option><option>AUD/JPY</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option selected>XAU/USD</option><option>XAG/USD</option>
+          </optgroup>
+          <optgroup label="Indices">
+            <option>US30</option><option>NAS100</option><option>SPX500</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pip_price">Current price (JPY/cross পেয়ারের জন্য)</label>
+        <input type="number" id="pip_price" value="2650.00" step="0.00001">
+      </div>
+    </div>
+
+    <div class="results" id="pip_results" style="display:block">
+      <div class="res-header">Pip &amp; value reference</div>
+      <div class="res-row"><span class="res-label">Contract size (1 std lot)</span><span class="res-val" id="pip_r_contract"></span></div>
+      <div class="res-row"><span class="res-label">Pip size</span><span class="res-val" id="pip_r_pipsize"></span></div>
+      <div class="res-row"><span class="res-label">Pip value — 1.0 lot (USD)</span><span class="res-val blue" id="pip_r_v1"></span></div>
+      <div class="res-row"><span class="res-label">Pip value — 0.10 lot (USD)</span><span class="res-val" id="pip_r_v01"></span></div>
+      <div class="res-row"><span class="res-label">Pip value — 0.01 lot (USD)</span><span class="res-val" id="pip_r_v001"></span></div>
+      <div class="res-row"><span class="res-label">Point size</span><span class="res-val" id="pip_r_pointsize"></span></div>
+      <div class="res-row notes-row"><span class="res-label">Notes</span><span class="res-val small" id="pip_r_notes"></span></div>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="compare" class="panel">
+    <div class="grid2">
+      <div class="field">
+        <label for="cmp_a">Instrument A</label>
+        <select id="cmp_a">
+          <optgroup label="Forex Majors"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option></optgroup>
+          <optgroup label="Metals"><option selected>XAU/USD</option><option>XAG/USD</option></optgroup>
+          <optgroup label="Indices"><option>US30</option><option>NAS100</option></optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cmp_b">Instrument B</label>
+        <select id="cmp_b">
+          <optgroup label="Forex Majors"><option selected>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option></optgroup>
+          <optgroup label="Metals"><option>XAU/USD</option><option>XAG/USD</option></optgroup>
+          <optgroup label="Indices"><option>US30</option><option>NAS100</option></optgroup>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="cmp_calc">Compare instruments</button>
+    <div id="cmp_out"></div>
+  </section>
+
+  <footer class="app-footer">
+    <p>সব হিসাব শুধুমাত্র সহায়ক তথ্যের জন্য — ট্রেডিং সিদ্ধান্তের আগে নিজে যাচাই করুন।</p>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
